@@ -1,0 +1,207 @@
+import 'package:flutter/material.dart'; 
+ 
+void main() { 
+  runApp(BMICalculatorApp()); 
+} 
+ 
+class BMICalculatorApp extends StatelessWidget { 
+  @override 
+  Widget build(BuildContext context) { 
+    return MaterialApp( 
+      debugShowCheckedModeBanner: false, 
+      home: BMICalculator(), 
+    ); 
+  } 
+} 
+ 
+class BMICalculator extends StatefulWidget { 
+  @override 
+  _BMICalculatorState createState() => _BMICalculatorState(); 
+} 
+ 
+class _BMICalculatorState extends State<BMICalculator> { 
+  double height = 0; 
+  double weight = 70; 
+  int age = 23; 
+  String selectedGender = 'Male'; 
+  double bmi = 0; 
+ 
+  String getBMIStatus(double bmiValue) { 
+    if (bmiValue < 18.5) return "Underweight"; 
+    if (bmiValue >= 18.5 && bmiValue <= 24.9) return "Normal weight"; 
+    if (bmiValue >= 25 && bmiValue <= 29.9) return "Overweight"; 
+    return "Obesity"; 
+  } 
+ 
+  void calculateBMI() { 
+    setState(() { 
+      bmi = weight / ((height / 100) * (height / 100)); // Height in cm to meters 
+    }); 
+  } 
+ 
+  @override 
+  Widget build(BuildContext context) { 
+    return Scaffold( 
+      appBar: AppBar( 
+        title: Text( 
+          'BMI Calculator', 
+          style: TextStyle(fontSize: 24), 
+        ), 
+        centerTitle: true, 
+        backgroundColor: Colors.blueAccent, 
+      ), 
+      body: Padding( 
+        padding: const EdgeInsets.all(20.0), 
+        child: Column( 
+          children: [ 
+            Text( 
+              'Welcome 😊\nBMI Calculator', 
+              textAlign: TextAlign.center, 
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold), 
+            ), 
+            SizedBox(height: 20), 
+            Row( 
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
+              children: [ 
+                GenderButton( 
+                  gender: 'Male', 
+                  isSelected: selectedGender == 'Male', 
+                  onTap: () { 
+                    setState(() { 
+                      selectedGender = 'Male'; 
+                    }); 
+                  }, 
+                ), 
+                GenderButton( 
+                  gender: 'Female', 
+                  isSelected: selectedGender == 'Female', 
+                  onTap: () { 
+                    setState(() { 
+                      selectedGender = 'Female'; 
+                    }); 
+                  }, 
+                ), 
+              ], 
+            ), 
+            SizedBox(height: 20), 
+            NumberSelector( 
+              label: 'Weight', 
+              value: weight, 
+              onChanged: (newValue) { 
+                setState(() { 
+                  weight = newValue; 
+                }); 
+              }, 
+            ), 
+            NumberSelector( 
+              label: 'Age', 
+              value: age.toDouble(), 
+              onChanged: (newValue) { 
+                setState(() { 
+                  age = newValue.toInt(); 
+                }); 
+              }, 
+            ), 
+            TextField( 
+              keyboardType: TextInputType.number, 
+              decoration: InputDecoration( 
+                labelText: 'Height (cm)', 
+                border: OutlineInputBorder(), 
+              ), 
+              onChanged: (value) { 
+                height = double.tryParse(value) ?? 0; 
+              }, 
+            ), 
+            SizedBox(height: 20), 
+            ElevatedButton( 
+              onPressed: () { 
+                calculateBMI(); 
+              }, 
+              child: Text("Let's Go"), 
+              style: ElevatedButton.styleFrom( 
+                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15), 
+                textStyle: TextStyle(fontSize: 18), 
+              ), 
+            ), 
+            SizedBox(height: 20), 
+            Text( 
+              bmi == 0 ? '' : bmi.toStringAsFixed(1), 
+              style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold), 
+            ), 
+            Text( 
+              bmi == 0 ? '' : getBMIStatus(bmi), 
+              style: TextStyle(fontSize: 24), 
+            ), 
+          ], 
+        ), 
+      ), 
+    ); 
+  } 
+} 
+ 
+class GenderButton extends StatelessWidget { 
+  final String gender; 
+  final bool isSelected; 
+  final VoidCallback onTap; 
+ 
+  GenderButton({required this.gender, required this.isSelected, required this.onTap}); 
+ 
+  @override 
+  Widget build(BuildContext context) { 
+    return GestureDetector( 
+      onTap: onTap, 
+      child: Container( 
+        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30), 
+        decoration: BoxDecoration( 
+          color: isSelected ? Colors.blueAccent : Colors.white, 
+          borderRadius: BorderRadius.circular(8), 
+          border: Border.all(color: Colors.blueAccent), 
+        ), 
+        child: Text( 
+          gender, 
+          style: TextStyle( 
+            fontSize: 18, 
+            color: isSelected ? Colors.white : Colors.blueAccent, 
+          ), 
+        ), 
+      ), 
+    ); 
+  } 
+} 
+ 
+class NumberSelector extends StatelessWidget { 
+  final String label; 
+  final double value; 
+  final ValueChanged<double> onChanged; 
+ 
+  NumberSelector({required this.label, required this.value, required this.onChanged}); 
+ 
+  @override 
+  Widget build(BuildContext context) { 
+    return Column( 
+      children: [ 
+        Text(label, style: TextStyle(fontSize: 18)), 
+        Row( 
+          mainAxisAlignment: MainAxisAlignment.center, 
+          children: [ 
+            IconButton( 
+              onPressed: () { 
+                onChanged(value - 1); 
+              }, 
+              icon: Icon(Icons.remove), 
+            ), 
+            Text(value.toInt().toString(), style: TextStyle(fontSize: 24)), 
+            IconButton( 
+              onPressed: () { 
+                onChanged(value + 1); 
+              }, 
+              icon: Icon(Icons.add), 
+            ), 
+          ], 
+        ), 
+      ], 
+    ); 
+  } 
+} 
+
+ 
